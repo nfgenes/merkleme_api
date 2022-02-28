@@ -1,0 +1,30 @@
+{
+  "name": "merklemeApi",
+  "version": "1.0.0",
+  "description": "Merkle Me Backend API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nfgenes/merkleme_api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nfgenes/merkleme_api/issues"
+  },
+  "homepage": "https://github.com/nfgenes/merkleme_api#readme",
+  "dependencies": {
+    "@pinata/sdk": "^1.1.23",
+    "axios": "^0.26.0",
+    "cors": "^2.8.5",
+    "ethers": "^5.5.4",
+    "express": "^4.17.3",
+    "express-rate-limit": "^6.3.0",
+    "keccak256": "^1.0.6",
+    "merkletreejs": "^0.2.30"
+  }
+}

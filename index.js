@@ -2,33 +2,24 @@ const fs = require("fs");
 const express = require("express");
 const app = express();
 const cors = require('cors');
-const ethers = require('ethers');
-const EventEmitter = require('events');
+const keccak = require('keccak256');
+const mkjs = require('merkletreejs');
+const pinata = require('@pinata/sdk');
 const axios = require('axios').default;
+const limiter = require('./middleware/limiter.js');
 // const path = require("path");
-// const { abi } = require('./utils/abi.json');
 
-// const Database = require("@replit/database");
-// const db = new Database();
+const testRouter = require('./middleware/generateMerkleTree');
+const testData = require('./utils/example.json');
 
 const PORT = process.env.PORT || 4001;
-// const WS_KEY = process.env['WS_KEY'];
-// const provider = new ethers.providers.WebSocketProvider(`wss://eth-rinkeby.alchemyapi.io/v2/${WS_KEY}`, 'rinkeby');
-// const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, provider);
-
-const CONTRACT_ADDRESS = '';
 const SERVER_ADDRESS = 'https://merklemeapi.vincanger.repl.co';
 
 app.use(express.json());
 app.use(cors());
+app.use(limiter);
 
-// contract.removeAllListeners();
-// contract.on('', () => {
-//   const newNumber = Number(x); 
-//   console.log("x: ", newNumber);
-//   console.log("successMsg: ", successMsg);
-//   axios.post(`${SERVER_ADDRESS}`, {num: newNumber})
-// });
+app.use('/test', testRouter);
 
 app.get('/', async (req, res) => {
   res.send('merkleMe API --');  
