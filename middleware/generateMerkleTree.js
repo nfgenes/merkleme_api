@@ -61,14 +61,14 @@ const saveMerkleRoot = () => {
   }
 }
 
-const generate = async (data) => {
+const generate = async ({ userEmail, data }) => {
   try {
     for (let i = 0; i < data.length; i++) {
       let currentHash;
       let currentValue;
-  
       currentValue = data[i];
-      currentHash = `0x${keccak256(data[i].toString('hex'))}`;
+      currentHash = `0x${keccak256(data[i]).toString('hex')}`;
+      
       /*
        * Create an object for each address containing the
        * address value and address hash
@@ -81,13 +81,23 @@ const generate = async (data) => {
      * show a mapping of each leaf value to its corresponding hash
     */
     fs.writeFileSync('./middleware/example/MerkleTreeSummary.json', JSON.stringify(leafValues));
+
+    /*
+    * Generate an instance of the Merkle Tree for the given whitelist
+    */
     generateMerkleTree(data);
     const rootObj = saveMerkleRoot();
+    
     /*
      * Publish data to IPFS via Pinata API and send JSON to client
     */
-    const pinResponse = await pinata.pinJSONToIPFS(rootObj);
-    console.log(pinResponse); // this might be better to return 
+    const pinOptions = {
+      pinataMetadata: {
+        name: `Collection Contact: ${userEmail}`
+      }
+    }
+    const pinResponse = await pinata.pinJSONToIPFS(rootObj, pinOptions);
+    console.log(pinResponse); // this might be better to return
     const ipfsURI = 'https://ipfs.io/ipfs/' + pinResponse.IpfsHash;
     return JSON.stringify(ipfsURI);
     
@@ -102,9 +112,8 @@ router.use((req, res, next) => {
 })
 
 router.post('/generate', async (req, res) => {
-  const sentData = req.body.data;
-  console.log(req.body);
-  console.log(sentData);
+  console.log(req.body); 
+  const sentData = req.body;
   const jsonValues = await generate(sentData);
   res.send(jsonValues);
 })
