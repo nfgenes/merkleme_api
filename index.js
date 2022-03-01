@@ -7,6 +7,7 @@ const limiter = require('./middleware/limiter.js');
 // const path = require("path");
 
 const generateMerkleTree = require('./middleware/generateMerkleTree');
+const generateMerkleProof = require('./middleware/generateMerkleProof');
 const testData = require('./utils/example.json');
 
 const PORT = process.env.PORT || 4001;
@@ -17,6 +18,7 @@ app.use(cors());
 app.use(limiter);
 
 app.use('/merkletree', generateMerkleTree);
+app.use('/verify', generateMerkleProof);
 
 app.get('/', async (req, res) => {
   res.send('merkleMe API --');

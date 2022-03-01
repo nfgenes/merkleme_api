@@ -2,11 +2,12 @@ const keccak256 = require('keccak256');
 const fs = require('fs');
 const { MerkleTree } = require('merkletreejs');
 const pinataSDK = require('@pinata/sdk');
+const sendEmail = require('../middleware/nodemailer');
 
 const express = require('express')
 const router = express.Router()
 
-pinata = pinataSDK(process.env['PINATA_API_KEY'], process.env['PINATA_API_SECRET']);
+const pinata = pinataSDK(process.env['PINATA_API_KEY'], process.env['PINATA_API_SECRET']);
 
 const leafValues = [];
 let tree;
@@ -18,9 +19,6 @@ let root;
  */
 
 const generateMerkleTree = (data) => {
-  /**
-   *  Generate a Merkle Tree based on the geneSymbols array
-   */
   try {
     console.log(`\nGenerating a Merkle Tree...`);
     tree = new MerkleTree(data, keccak256, {sortPairs: true, sortLeaves: true, sort: true, hashLeaves: true});
@@ -96,10 +94,22 @@ const generate = async ({ userEmail, data }) => {
         name: `Collection Contact: ${userEmail}`
       }
     }
-    const pinResponse = await pinata.pinJSONToIPFS(rootObj, pinOptions);
-    console.log(pinResponse); // this might be better to return
-    const ipfsURI = 'https://ipfs.io/ipfs/' + pinResponse.IpfsHash;
-    return JSON.stringify(ipfsURI);
+
+    // Publish White List
+    const pinResponseWhitelist = await pinata.pinJSONToIPFS(data, pinOptions);
+    const ipfsURIWhitelist = 'https://ipfs.io/ipfs/' + pinResponseWhitelist.IpfsHash;
+
+    // Publish Merkle Root
+    const pinResponseRootHash = await pinata.pinJSONToIPFS(rootObj, pinOptions);
+    console.log(pinResponseRootHash); // this might be better to return
+    const ipfsURIRootHash = 'https://ipfs.io/ipfs/' + pinResponseRootHash.IpfsHash;
+
+    sendEmail({userEmail, ipfsURIWhitelist, ipfsURIRootHash});
+    
+    return {
+      "Whitelist":`${ipfsURIWhitelist}`,
+      "Root Hash":`${ipfsURIRootHash}`
+    }
     
   } catch (e) {
     console.log(e);
