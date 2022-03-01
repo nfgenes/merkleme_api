@@ -2,14 +2,11 @@ const fs = require("fs");
 const express = require("express");
 const app = express();
 const cors = require('cors');
-const keccak = require('keccak256');
-const mkjs = require('merkletreejs');
-const pinata = require('@pinata/sdk');
 const axios = require('axios').default;
 const limiter = require('./middleware/limiter.js');
 // const path = require("path");
 
-const testRouter = require('./middleware/generateMerkleTree');
+const generateMerkleTree = require('./middleware/generateMerkleTree');
 const testData = require('./utils/example.json');
 
 const PORT = process.env.PORT || 4001;
@@ -19,10 +16,10 @@ app.use(express.json());
 app.use(cors());
 app.use(limiter);
 
-app.use('/test', testRouter);
+app.use('/merkletree', generateMerkleTree);
 
 app.get('/', async (req, res) => {
-  res.send('merkleMe API --');  
+  res.send('merkleMe API --');
 });
 
 app.post('/', (req, res) => {
@@ -34,6 +31,6 @@ app.get('/newEndpoint', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Server is listening on port ${PORT}...`)
-    console.log('\nWaiting for contract to emit new event...');
+  console.log(`Server is listening on port ${PORT}...`)
+  console.log('\nWaiting for contract to emit new event...');
 });
