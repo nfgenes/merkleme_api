@@ -1,6 +1,7 @@
 const nodemailer = require('nodemailer');
 
-const sendEmail = async ({userEmail, ipfsURIWhitelist, ipfsURIRootHash, ipfsTreeSummary}) => {
+const sendEmail = async (userEmail, ipfsURIWhitelist, ipfsURIRootHash, ipfsTreeSummary) => {
+  console.log()
   try {
     let transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',

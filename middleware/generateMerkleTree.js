@@ -1,4 +1,4 @@
-const keccak256 = require('keccak256');
+  const keccak256 = require('keccak256');
 const { MerkleTree } = require('merkletreejs');
 const pinataSDK = require('@pinata/sdk');
 const sendEmail = require('../middleware/nodemailer');
@@ -85,10 +85,11 @@ const generate = async ({ userEmail, collectionName, data }) => {
     // to show a mapping of each leaf value to its corresponding hash
     const pinResponseTreeSummary = await pinata.pinJSONToIPFS(leafValues, pinOptions);
     const ipfsURITreeSummary = 'https://ipfs.io/ipfs/' + pinResponseTreeSummary.IpfsHash;
+    console.log(ipfsURITreeSummary, '?!?!?!][][][][]');
 
     // Check if optional user email is provided, if so call 'sendEmail'
     if (userEmail) {
-      sendEmail({userEmail, ipfsURIWhitelist, ipfsURIRootHash, ipfsURITreeSummary});
+      sendEmail( userEmail, ipfsURIWhitelist, ipfsURIRootHash, ipfsURITreeSummary );
     } else {
       console.log(`No email was provided`);
     }
