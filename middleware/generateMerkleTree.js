@@ -107,8 +107,8 @@ const generate = async ({ userEmail, data }) => {
     sendEmail({userEmail, ipfsURIWhitelist, ipfsURIRootHash});
     
     return {
-      "Whitelist":`${ipfsURIWhitelist}`,
-      "Root Hash":`${ipfsURIRootHash}`
+      "whitelist":`${ipfsURIWhitelist}`,
+      "rootHash":`${ipfsURIRootHash}`
     }
     
   } catch (e) {

@@ -51,52 +51,68 @@ const generateMerkleTree = async (ipfsURIWhitelist, leafToVerify) => {
  * Using the selected leaf value, lookup the corresponding hash
  * and index from the Merkle Tree Summary json file
 */
-const getLeafHashFromTreeSummary = (symbol) => {
+const getLeafHashFromTreeSummary = (leafToVerify) => {
   try {
-    const treeSummary = JSON.parse(fs.readFileSync('./example/MerkleTreeSummary.json'));
-    const leafHash = treeSummary.filter(x => x.Leaf === symbol);
-    leafHash != 0 ? leafIndex = tree.getLeafIndex(leafHash[0].Hash) : checkStatus = 0;
+    const leafHash = `0x${keccak256(leafToVerify).toString('hex')}`;
+    console.log(tree.getLeafIndex(leafHash), 'leafIndex');
+    leafIndex = tree.getLeafIndex(leafHash);
   } catch (e) {
     console.log(e);
   }
 }
 
-const checkValue = () => {
-  checkStatus === 0 ? console.log("Error: value does not exist within the list") : getProof(leafIndex);
-}
+// const checkValue = () => {
+//   return checkStatus === 0 ? console.log("Error: value does not exist within the list") : getProof(leafIndex);
+// }
 
-const getProof = (value) => {
+const getProof = () => {
   try {
+    console.log('here', checkStatus)
+    if (leafIndex == -1) {
+      console.log('Error: value does not exist within the list');
+      return {
+        leaf: leaf,
+        errorMsg: 'Error: value does not exist within the list'
+      }
+    } 
+    
     const leaves = tree.getHexLeaves();
-    const proof = tree.getHexProof(leaves[value]);
+    const proof = tree.getHexProof(leaves[leafIndex]);
     const leafValueHex = toHex(leaf);
-    const leafFilePath = `./example/MerkleProof_${leaf}.json`;
+
+    const proofObj = {
+        leafValue: leaf,
+        leafHex: leafValueHex,
+        leafHash: leaves[leafIndex],
+        proof: proof
+    };
+
+    console.log('proof obj before check', proofObj);
+
   
     console.log(`Proof generated for ${leaf}`);
-    console.log(`Saving proof to ${leafFilePath}`);
-    fs.writeFileSync(leafFilePath, JSON.stringify({
-        "Leaf Value": leaf,
-        "Leaf Hex": leafValueHex,
-        "LeafHash": leaves[value],
-        "Proof": proof
-    }));
+
+    return proofObj;
   } catch (e) {
     console.log(e);
   }
 }
 
-const runProof = (leafToProve) => {
-  generateMerkleTree(leafToProve);
+const runProof = async (whitelist, leafToVerify) => {
+  await generateMerkleTree(whitelist, leafToVerify);
   // pass in a leaf value to generate a proof
-  getLeafHashFromTreeSummary(leaf)
-  checkValue()
+  getLeafHashFromTreeSummary(leaf);
+  return getProof();
 }
 
 router.post('/proof', async (req, res) => {
   console.log(req.body); 
-  await generateMerkleTree(req.body.whitelist, req.body.leafToVerify);
-
-  res.end();
+  const result = await runProof(req.body.whitelist, req.body.leafToVerify);
+  if (result.errorMsg) {
+    res.status(500).json(result);
+  } else {
+    res.json(result);
+  }
 })
 
 module.exports = router;
