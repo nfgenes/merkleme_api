@@ -20,12 +20,8 @@ let root;
 
 const generateMerkleTree = (data) => {
   try {
-    console.log(`\nGenerating a Merkle Tree...`);
     tree = new MerkleTree(data, keccak256, {sortPairs: true, sortLeaves: true, sort: true, hashLeaves: true});
     root = tree.getHexRoot();
-  
-    // For a short list, you can log it out, but not recommended for large lists
-    console.log('Tree:\n', tree.toString());
     
     fs.writeFileSync('./middleware/example/MerkleTree.txt', tree.toString());
     console.log(`Merkle tree generated.
@@ -104,7 +100,12 @@ const generate = async ({ userEmail, data }) => {
     console.log(pinResponseRootHash); // this might be better to return
     const ipfsURIRootHash = 'https://ipfs.io/ipfs/' + pinResponseRootHash.IpfsHash;
 
-    sendEmail({userEmail, ipfsURIWhitelist, ipfsURIRootHash});
+    // Check if optional user email is provided, if so call 'sendEmail'
+    if (userEmail) {
+      sendEmail({userEmail, ipfsURIWhitelist, ipfsURIRootHash});
+    } else {
+      console.log(`No email was provided`);
+    }
     
     return {
       "whitelist":`${ipfsURIWhitelist}`,
