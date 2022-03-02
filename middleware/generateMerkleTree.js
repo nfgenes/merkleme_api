@@ -1,5 +1,4 @@
 const keccak256 = require('keccak256');
-const fs = require('fs');
 const { MerkleTree } = require('merkletreejs');
 const pinataSDK = require('@pinata/sdk');
 const sendEmail = require('../middleware/nodemailer');
@@ -22,15 +21,13 @@ const generateMerkleTree = (data) => {
   try {
     tree = new MerkleTree(data, keccak256, {sortPairs: true, sortLeaves: true, sort: true, hashLeaves: true});
     root = tree.getHexRoot();
-    
-    fs.writeFileSync('./middleware/example/MerkleTree.txt', tree.toString());
+
     console.log(`Merkle tree generated.
     \nRoot hash is ${root}
     \nTree Summary:
     \n     Leaf Count: ${tree.getLeafCount()}
     \n     Layer Count: ${tree.getLayerCount()}
     \n     Tree Depth: ${tree.getDepth()}
-    \nSaving to MerkleTree.txt
     `);
   } catch (e) {
     console.log(e);
@@ -38,21 +35,11 @@ const generateMerkleTree = (data) => {
 }
 
 /*
- * Save the root hash to a file 'MerkleRoot.json'
+ * Save merkle root as Object to publish to IPFS
 */
 const saveMerkleRoot = () => {
-  try {
-    const rootObj = {rootHash: root}
-    const jsonRoot = JSON.stringify(rootObj);
-
-    fs.writeFileSync('./middleware/example/MerkleRoot.json', jsonRoot);
-    console.log(`Saving the Merkle Root '${root}' to 'MerkleRoot.json'`);
-    
-    return rootObj;
- 
-  } catch (e) {
-    console.log(e);
-  }
+  const rootObj = {rootHash: root};  
+  return rootObj;
 }
 
 const generate = async ({ userEmail, data }) => {
@@ -69,12 +56,6 @@ const generate = async ({ userEmail, data }) => {
       */
       leafValues.push({Leaf: currentValue, Hash: currentHash});
     }
-  
-    /*
-     * Generate a file containing a summary of the leaves - i.e.
-     * show a mapping of each leaf value to its corresponding hash
-    */
-    fs.writeFileSync('./middleware/example/MerkleTreeSummary.json', JSON.stringify(leafValues));
 
     /*
     * Generate an instance of the Merkle Tree for the given whitelist
@@ -97,19 +78,24 @@ const generate = async ({ userEmail, data }) => {
 
     // Publish Merkle Root
     const pinResponseRootHash = await pinata.pinJSONToIPFS(rootObj, pinOptions);
-    console.log(pinResponseRootHash); // this might be better to return
     const ipfsURIRootHash = 'https://ipfs.io/ipfs/' + pinResponseRootHash.IpfsHash;
+
+    // Publish Merkle Tree Summary
+    // to show a mapping of each leaf value to its corresponding hash
+    const pinResponseTreeSummary = await pinata.pinJSONToIPFS(leafValues, pinOptions);
+    const ipfsURITreeSummary = 'https://ipfs.io/ipfs/' + pinResponseTreeSummary.IpfsHash;
 
     // Check if optional user email is provided, if so call 'sendEmail'
     if (userEmail) {
-      sendEmail({userEmail, ipfsURIWhitelist, ipfsURIRootHash});
+      sendEmail({userEmail, ipfsURIWhitelist, ipfsURIRootHash, ipfsURITreeSummary});
     } else {
       console.log(`No email was provided`);
     }
     
     return {
       "whitelist":`${ipfsURIWhitelist}`,
-      "rootHash":`${ipfsURIRootHash}`
+      "rootHash":`${ipfsURIRootHash}`,
+      "treeSummary": `${ipfsURITreeSummary}`
     }
     
   } catch (e) {

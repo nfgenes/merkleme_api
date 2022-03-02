@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer');
 
-const sendEmail = async ({userEmail, ipfsURIWhitelist, ipfsURIRootHash}) => {
+const sendEmail = async ({userEmail, ipfsURIWhitelist, ipfsURIRootHash, ipfsTreeSummary}) => {
   try {
     let transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -16,7 +16,10 @@ const sendEmail = async ({userEmail, ipfsURIWhitelist, ipfsURIRootHash}) => {
       from: 'MerkleMe',
       to: userEmail,
       subject: 'Your MerkleMe IPFS data',
-      text: `Your Whitelist: ${ipfsURIWhitelist} \nYour Root Hash: ${ipfsURIRootHash} \n\n You Have Been Succesfully Merkled ;)`
+      text: `Your Whitelist: ${ipfsURIWhitelist} \n
+      Your Root Hash: ${ipfsURIRootHash} \n
+      Your Merkle Tree Summary: ${ipfsTreeSummary} \n\n
+      You Have Been Succesfully Merkled ;)`
     };
   
     return await transporter.sendMail(mailOptions);
