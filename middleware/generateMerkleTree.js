@@ -42,7 +42,7 @@ const saveMerkleRoot = () => {
   return rootObj;
 }
 
-const generate = async ({ userEmail, data }) => {
+const generate = async ({ userEmail, collectionName, data }) => {
   try {
     for (let i = 0; i < data.length; i++) {
       let currentHash;
@@ -68,7 +68,8 @@ const generate = async ({ userEmail, data }) => {
     */
     const pinOptions = {
       pinataMetadata: {
-        name: `Collection Contact: ${userEmail}`
+        name: `Collection Name: ${collectionName}`,
+        contact: `Collection Contact: ${userEmail}`
       }
     }
 
