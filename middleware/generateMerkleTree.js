@@ -85,7 +85,6 @@ const generate = async ({ userEmail, collectionName, data }) => {
     // to show a mapping of each leaf value to its corresponding hash
     const pinResponseTreeSummary = await pinata.pinJSONToIPFS(leafValues, pinOptions);
     const ipfsURITreeSummary = 'https://ipfs.io/ipfs/' + pinResponseTreeSummary.IpfsHash;
-    console.log(ipfsURITreeSummary, '?!?!?!][][][][]');
 
     // Check if optional user email is provided, if so call 'sendEmail'
     if (userEmail) {

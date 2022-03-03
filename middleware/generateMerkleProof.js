@@ -16,7 +16,6 @@ const router = express.Router()
  let root;
  let leaf
  let leafIndex;
- let checkStatus;
 
 // Takes any full IPFS URI and returns the CID only
 const parseCID = (ipfsURI) => {
@@ -61,13 +60,8 @@ const getLeafHashFromTreeSummary = (leafToVerify) => {
   }
 }
 
-// const checkValue = () => {
-//   return checkStatus === 0 ? console.log("Error: value does not exist within the list") : getProof(leafIndex);
-// }
-
 const getProof = () => {
   try {
-    console.log('here', checkStatus)
     if (leafIndex == -1) {
       console.log('Error: value does not exist within the list');
       return {
