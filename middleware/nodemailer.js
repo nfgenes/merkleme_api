@@ -17,10 +17,7 @@ const sendEmail = async (userEmail, ipfsURIWhitelist, ipfsURIRootHash, ipfsTreeS
       from: 'MerkleMe',
       to: userEmail,
       subject: 'Your MerkleMe IPFS data',
-      text: `Your Whitelist: ${ipfsURIWhitelist} \n
-      Your Root Hash: ${ipfsURIRootHash} \n
-      Your Merkle Tree Summary: ${ipfsTreeSummary} \n\n
-      You Have Been Succesfully Merkled ;)`
+      text: `Your Whitelist: ${ipfsURIWhitelist} \n\nYour Root Hash: ${ipfsURIRootHash} \n\nYour Merkle Tree Summary: ${ipfsTreeSummary} \n\nYou Have Been Succesfully Merkled ;)`
     };
   
     return await transporter.sendMail(mailOptions);
