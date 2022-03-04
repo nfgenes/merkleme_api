@@ -1,4 +1,4 @@
-  const keccak256 = require('keccak256');
+const keccak256 = require('keccak256');
 const { MerkleTree } = require('merkletreejs');
 const pinataSDK = require('@pinata/sdk');
 const sendEmail = require('../middleware/nodemailer');
@@ -8,16 +8,12 @@ const router = express.Router()
 
 const pinata = pinataSDK(process.env['PINATA_API_KEY'], process.env['PINATA_API_SECRET']);
 
-const leafValues = [];
-let tree;
-let root;
+const generate = async ({ userEmail, collectionName, data }) => {
+  let tree;
+  let root;
+  const leafValues = [];
 
-/**
- *  TO DO: Add a check for a generated tree that is unbalanced. At a minimum
- *  give a notice of unbalaned tree and perhaps add functionality to auto-balance.
- */
-
-const generateMerkleTree = (data) => {
+  const generateMerkleTree = (data) => {
   try {
     tree = new MerkleTree(data, keccak256, {sortPairs: true, sortLeaves: true, sort: true, hashLeaves: true});
     root = tree.getHexRoot();
@@ -34,15 +30,14 @@ const generateMerkleTree = (data) => {
   }
 }
 
-/*
- * Save merkle root as Object to publish to IPFS
-*/
-const saveMerkleRoot = () => {
-  const rootObj = {rootHash: root};  
-  return rootObj;
-}
-
-const generate = async ({ userEmail, collectionName, data }) => {
+  /*
+   * Save merkle root as Object to publish to IPFS
+  */
+  const saveMerkleRoot = () => {
+    const rootObj = {rootHash: root};  
+    return rootObj;
+  }
+  
   try {
     for (let i = 0; i < data.length; i++) {
       let currentHash;
@@ -75,16 +70,16 @@ const generate = async ({ userEmail, collectionName, data }) => {
 
     // Publish White List
     const pinResponseWhitelist = await pinata.pinJSONToIPFS(data, pinOptions);
-    const ipfsURIWhitelist = 'https://ipfs.io/ipfs/' + pinResponseWhitelist.IpfsHash;
+    const ipfsURIWhitelist = 'https://gateway.pinata.cloud/ipfs/' + pinResponseWhitelist.IpfsHash;
 
     // Publish Merkle Root
     const pinResponseRootHash = await pinata.pinJSONToIPFS(rootObj, pinOptions);
-    const ipfsURIRootHash = 'https://ipfs.io/ipfs/' + pinResponseRootHash.IpfsHash;
+    const ipfsURIRootHash = 'https://gateway.pinata.cloud/ipfs/' + pinResponseRootHash.IpfsHash;
 
     // Publish Merkle Tree Summary
     // to show a mapping of each leaf value to its corresponding hash
     const pinResponseTreeSummary = await pinata.pinJSONToIPFS(leafValues, pinOptions);
-    const ipfsURITreeSummary = 'https://ipfs.io/ipfs/' + pinResponseTreeSummary.IpfsHash;
+    const ipfsURITreeSummary = 'https://gateway.pinata.cloud/ipfs/' + pinResponseTreeSummary.IpfsHash;
 
     // Check if optional user email is provided, if so call 'sendEmail'
     if (userEmail) {
