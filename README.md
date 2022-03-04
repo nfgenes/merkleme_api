@@ -5,8 +5,8 @@ After submitting your entire whitelist via the MerkleMe homepage, your frontend 
 
 In order to generate the correct proof, you need to pass the correct JSON data to the endpoint:
 <ul>
-  <li>"whitelist": IPFS Link to List of data, e.g. the original "whitelist" of users' wallet addresses
-  <li>"leafToVerify": Leaf, e.g. the wallet address of the user to be verified 
+  <li>"whitelist": IPFS link to list of data, e.g. the original "whitelist" of users' wallet addresses. This was provided to you by the MerkleMe client when you submitted your data.
+  <li>"leafToVerify": Leaf, e.g. the wallet address of the user to be verified. This is the currently connected user's wallet address 
 </ul>
 
 ENDPOINT: https://merklemeapi.vincanger.repl.co/verify/proof 
