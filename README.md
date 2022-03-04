@@ -1,7 +1,7 @@
 # Merkle Me Backend API
 ## Generate A Merkle Proof
 
-After submitting your entire whitelist, your frontend client will need to provide your Solidity Contract with a way of verifying that the connected user's wallet address is a part of this whitelist. The MerkleMe API provides your frontend with the "proof" (i.e. "key") that your contract needs. 
+After submitting your entire whitelist via the MerkleMe homepage, your frontend client will need to provide your Solidity Contract with a way of verifying that the connected user's wallet address is a part of this whitelist. The MerkleMe API provides your frontend with the "proof" (i.e. "key") that your contract needs. 
 
 In order to generate the correct proof, you need to pass the correct JSON data to the endpoint:
 <ul>
